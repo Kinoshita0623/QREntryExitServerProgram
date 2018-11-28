@@ -42,5 +42,7 @@ data class EntryExitCode(val groupId: String?, val entryExitCode:String?, val st
 //EntryAndExitLog
 //year, month, day, hour, minute, flag
 data class EntryExitLogTimeData(val userId:String, val year:Int, val month:Int, val day:Int, val hour:Int, val minute:Int, val flag:String)
+data class EntryExitLogTimeDataAndGroupId(val groupId:String, val year: Int, val month: Int, val day: Int , val hour: Int, val minute: Int, val flag: String)
 data class UserTokenAndGroupId(val userToken: String,val groupId: String)
+data class TokenAndLimit(val token:String, val limit:Int)
 

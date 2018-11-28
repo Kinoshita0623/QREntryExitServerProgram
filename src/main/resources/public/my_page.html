@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF8">
+    <meta name="viewport" content="width=350">
+    <script src="jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="sty.css">
+</head>
+<body>
+    <div id="back">
+        <header>
+            <b>QR入退室管理</b>
+        </header>
+                
+        <main>
+            <p id="userName"></p>
+
+            <div id="group">
+                <h2 id="groups">所属グループ</h2>
+                <button id="viewGroup">表示</button>
+                
+            </div>
+            <h2 id="near_log">直近の入退室履歴</h2>
+        </main>
+    </div>
+    
+
+
+
+
+
+<script type="text/javascript">
+
+    var token = "エラー"
+    var array;
+
+            $(function(){
+                $.ajax({
+
+                    type:'GET',
+                
+                    dataType:'application/json',
+                    url:'api/auth'
+                })
+
+                .always((data) =>{
+                
+                    console.log(data.responseText);
+                    var json = JSON.parse(data.responseText)
+                    if(json.token != null){
+                        token = json.token
+                        //console.log(token)
+                        getMyData()
+                    }else{
+                        window.location.href="/login"
+                    }
+                    
+                })
+                
+                console.log(token)
+            });
+
+            function getMyData(){
+                var jsonData = {
+                    "token":token
+                }
+                
+                $.ajax({
+                    type:'POST',
+                    dataType:'application/json',
+                    data:JSON.stringify(jsonData),
+                    url:'api/user/i'
+                }).always((data)=>{
+                    console.log(data.responseText);
+                    var obj = JSON.parse(data.responseText)
+                    if(obj.status != 'ERROR'){
+                        $('#userName').text(obj.name + "さんようこそ")
+                        array = obj.yourGroup
+                        //displayGroups()
+                        
+                    }else{
+                        window.location.href = "/login"
+                        
+                    }
+                    
+                });
+                
+            }
+
+            $('#viewGroup').on('click',displayGroups);
+            var isPusshed = false;
+
+            function displayGroups(){
+                if(isPusshed){
+                    $('.groupList').remove();
+                    $('#viewGroup').text("表示")
+                    isPusshed = false;
+                }else{
+                    console.log("displayGroupsが呼び出された")
+                for(let v of array){
+                    console.log("取り出したグループ")
+                    $('#viewGroup').after("<p class=\"groupList\">" + "グループ名:" + v.groupName + "グループID" + v.groupId +"<p>")
+                    $('#viewGroup').text("非表示")
+                    isPusshed = true;
+                }
+
+                }
+                
+                
+            }
+        </script>
+
+</body>
+</html>
+

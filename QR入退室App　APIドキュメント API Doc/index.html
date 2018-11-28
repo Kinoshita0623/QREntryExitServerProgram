@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <link href="http://alexgorbatchev.com/pub/sh/current/styles/shCore.css" rel="stylesheet" type="text/css">
+    <link href="http://alexgorbatchev.com/pub/sh/current/styles/shThemeDefault.css" rel="stylesheet" type="text/css">
+    <script src="http://alexgorbatchev.com/pub/sh/current/scripts/shCore.js" type="text/javascript"></script>
+    <script src="http://alexgorbatchev.com/pub/sh/current/scripts/shBrushCSharp.js" type="text/javascript"></script>
+    <script src="http://alexgorbatchev.com/pub/sh/current/scripts/shBrushCpp.js" type="text/javascript"></script>
+    <script src="http://alexgorbatchev.com/pub/sh/current/scripts/shBrushJScript.js" type="text/javascript"></script>
+    <script src="http://alexgorbatchev.com/pub/sh/current/scripts/shBrushJava.js" type="text/javascript"></script>
+    <script src="http://alexgorbatchev.com/pub/sh/current/scripts/shBrushXml.js" type="text/javascript"></script>
+    <script language="javascript" type="text/javascript">
+     SyntaxHighlighter.config.bloggerMode = true;
+      SyntaxHighlighter.all();
+    </script>
+
+
+    <title>QR入退出管理App（仮）APIドキュメント</title>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            QR入退出管理App（仮）APIドキュメント
+        </header>
+              
+        <div class="content">
+            <!--mainここから-->
+            <main class="main">
+            <div id="raiout">
+                <div id="thisApp">
+                    <h1>当アプリケーションの概要</h1>
+                    <p>
+                        当アプリケーションはQRコードによって入退出のログを取るアプリです。 
+                        <br>そして当アプリケーションはWebアプリ方式をとります。
+                        詳しい説明に入る前に静的ページ、動的ページ、Webアプリケーションについて説明します。
+                    </p>
+                    <h2>静的ページ</h2>
+                    <p>
+                        静的ページとは事前にエディターや統合開発環境などでHTMLやCSS、JSなどを用いてコードを書きブラウザが<br>
+                        そのファイルを要求するとサーバーはそのファイルをそのまま返します。JSが変更（DOM）を加える場合もありますが<br>
+                        基本的にはコーディングしたときのままのものが送信されます。<br>
+                        ちなみにこのAPIドキュメントは静的ページに属します<br>
+                    </p>
+                    
+                    <div class="line"></div>
+                    <h2>動的ページ</h2>
+                    <p>
+                        動的ページとはユーザーがファイルを要求したときに
+                        サーバが事前にJavaやRubyなどなどで書かれたサーバーサイドプログラムに基づいて
+                        動的にHTMLのコードが生成されます。
+                        なのでユーザーなどに合わせたページを送信したり、データーベースにアクセスして記事の内容だけは変更するなどといった処理もできます
+                    </p>
+                    <div class="line"></div>
+                    <h2>Webアプリケーション</h2>
+                    <p>
+                        基本的にはHTMLとCSS、JSで書かれている点については上記の動的ページ静的ページと同じです<br>
+                        しかしこのJSの部分とサーバーサイドの部分が大きく違います。<br>
+                        動的ページはサーバーサイドでHTMLが生成されてそのHTMLファイルが送信されます。<br>
+                        しかしWebアプリケーションははじめはHTML、CSS、JSなどのファイルが送信されるのですが<br>
+                        クライアント側のJSがサーバーとXMLやjsonなどを用いてデータを送受信しJSがHTMLなどに変更を与えデータを表示します<br>
+                        動的ページとの最大の差はサーバーで毎度データに基づいて変更を与えるのか<br>
+                        クライアント側のJSがサーバーとデータを送受信し変更を与えるのかということです。<br>
+                            
+                            
+                    </p>
+                    <div class="line"></div>
+                    <h2>当アプリケーションの大まかな仕様</h2>
+                    <p>
+                        当アプリケーションはWebアプリケーション方式を取り
+                        サーバとクライアント間はjsonを使用します。やや時代遅れにも思いますがRESTアーキテクチャを採用しています。
+                        基本的にはログインするとランダムに生成された認証情報が送信されるので
+                        何らかのリクエストを送信するときにはjsonに必ずこの認証情報を含めます(ココ重要)
+                        そしてそのjsonの利用方法（APIの使用方法）が以下に書かれています。                          
+                    </p>
+                    <div class="line"></div>
+                    
+                </div>
+                <div id="whatNeed">
+                    <h1>クライアント開発において必要なもの</h1>
+                    <ul>
+                        <li><a href="https://chrome.google.com/webstore/detail/advanced-rest-client/hgmloofddffdnphfgcellkdfbfbjeloo">Advanced REST client</a></li>
+                        <li><a href="http://www.h2database.com/html/main.html">H2 database</a></li>
+                        <li><a href="https://www.jetbrains.com/idea/">IntelliJ</a></li>
+                        <li><a href="https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">JDK(Java 8)</a></li>
+                        <li><a href="https://github.com/Kinoshita0623/QRTimeTableApp">サーバーサイドプログラム</a></li>
+                        <li>VSCodeなどのエディタ</li>
+                    </ul>
+                    <h2>Advanced REST client</h2>
+                    <p>
+                        いきなりJSやHTMLなどのコードをかいてもいいのですが<br>
+                        やはりその前にAPIがどのように動くなどをテストしたくなる時があるでしょう<br>
+                        そのためのPOSTやGETリクエストを送信するためのChrome拡張機能です。<br>
+                    </p>
+                    <div class="line"></div>
+
+                    <h2>H2 database</h2>
+                    <p>
+                        当アプリではH2 databaseというデータベースを利用しています。<br>
+                        当然インストールしないと当アプリのサーバーサイドプログラムをあなたのPCで動かすことができません<br>
+                    </p>
+                    <div class="line"></div>
+                    <h2>IntelliJ</h2>
+                    <p>
+                        IntelliJとはJavaやKotlinを開発するための統合開発環境です。<br>
+                        jreファイルとして配布もするのですがソースコードを参考にしたり、一部をカスタマイズしてギミックをテストしたり<br>
+                        自分でビルドするのにとても便利です。PCの容量がどうしてもないといった事情がない限りインストールしておきましょう<br>
+
+                    </p>
+                    <div class="line"></div>
+                    <h2>JDK (Java 8)</h2>
+                    <p>
+                        当アプリのサーバーサイドプログラムはJVM上で動作しますので必ずインストールしましょう。<br>
+                        インストールしないとあなたはサーバーサイドプログラムをあなたのPCでテストすることができません。
+                    </p>
+                    <h2>サーバーサイドプログラム</h2>
+                    <p>
+                        当アプリのサーバーサイドが既にWeb上で動作していれば必要はないですが<br>
+                        まだ公開はしていないので基本的にあなたのPCで動作させる必要があります。
+                    </p>
+                    <div class="line"></div>
+                    <h2>エディタ</h2>
+                    <p>
+                        統合開発環境でもCUIエディタでも使いやすいものなら何でも構いませんができればUTF-8でお願いします。<br>
+                        あとここはVim,Emacs,VSCodeのどれがいいなどと議論する場所ではありませんからね！！（ここ重要）
+                    </p>
+
+                </div>
+
+                
+                <div id="howToUseAPI">
+                    <h1>チュートリアル</h1>
+                    <p>
+                        まずチュートリアルとしてアカウントを作成するページを作成してみましょう。<br>
+                        APIは基本的に特定のURLにGET,POST,PUT,DELETEなど操作によって指定された方式でjsonなどのデータを送信します。<br>
+
+                        <h2>TODO　作成中</h2>
+                    </p>
+                    <h2>URLの構造</h2>
+                    <p>
+                        APIのURLは基本的に<br>
+                        ドメイン/api/<br>
+                        といった形式になり例えばドメインがlocalhostでポートが5353なら<br>
+                        http://localhost:5353/api/となりlocalhost:5353はドメインです。<br>
+                        例えばアカウントを作成する場合は<br>
+                        ドメイン/api/user/createとなりここへ指定された形式のjsonをPOSTで送信します。<br>
+                        この送信先のURLとjosnの形式,GET,POSTなどは操作ごとに説明します。
+                    </p>
+                    <div class="line"></div>
+                    <h2>アカウントを作成するページを作ってみよう</h2>
+                    <p>
+                        まずhtmlファイルとjsファイルを用意しましょう。<br>
+                        今回はjQueryというフレームワークを使用します。<br>
+                        もちろんJSのXMLHttpRequestを使ってもできますがjQueryの方が楽なのでjQueryを利用します。<br>
+                        最近はVue.jsやReact.jsが主流みたいですね。<br>
+                        今回は基本的なHTMLの宣言などは省略します。<br>
+                        まずHTMLのbodyにフォームを作りましょう。
+                    <pre class="brush: html">
+                            <form id="form_1" method="post" accept-charset="utf-8" return false>
+                                    <p>ID:<input type="text" name="userid" id="userid"></p>
+                                    <p>Name:<input type="text" name="nameVal" id="nameVal"></p>
+                                    <p>パスワード:<input type="text" name="password" id="password"></p>
+                                
+                            </form>
+                            <button id ="ajax">登録</button>
+                    </pre>
+
+                    同じbody内のformの少し下にjQueryのコードをかきます。
+                    <pre class="brush: javascript">
+                            <script type="text/javascript">
+                                $(function(){
+                                    
+                                    $('#ajax').on('click', function(){
+
+                                        //JSONを作成します。
+                                        var JSONdata = {
+                                        
+                                            "id": $('#userid').val(),
+                                            "name":$('#nameVal').val(),
+                                            "password": $('#password').val()
+                    
+                                        }
+                                        
+                                        $.ajax({
+                                            
+                                            type:'POST',
+                                            data:JSON.stringify(JSONdata),
+                                            dataType:'application/json',
+                                            
+                                            //URLは環境に合わせて変更してください。
+                                            url:'http://localhost:5353/api/user/create'
+                                        })
+                                        .done((data) => {
+                                            $('.result').html(data);
+                                            console.log(data);
+                                        })
+                                        .fail((data) => {
+                                            $('.result').html(data);
+                                            console.log(data);
+                                        })
+                                        .always((data) =>{
+                    
+                                        });
+                                    });
+                                });
+                            </script>
+                    </pre>
+                    ブラウザのコンソールに結果が表示されるはずです。<br>
+                    <h3>基本的な流れ</h3>
+                    <p>
+                        基本的な流れとしてはFormなどで入力を受け付けそれをJSONにして送信<br>
+                        JSONとして帰ってくるのでそれをパースしてデータの取り出しをしてDOMで画面にデータを表示します。<br>
+                        操作によってはTokenなどが必要だったりするので気を付けてください<br>
+                        <b>あとは頑張ってください！！！！</b>
+                    </p>
+
+                    </p>
+                    <div class="line"></div>
+                    <!--<h2>ログインページを作成してみよう</h2>
+                    <p>                       
+                        早速先ほど作成したアカウント作成ページでアカウントを作成し<br>
+                        今作ったログイン画面に作成したアカウントのIDとパスワードを正しく入力しましょう<br>
+                        どうでしょうか？何か良くわからない文字列が返ってきませんでしたか？<br>
+                        それは認証情報です。今後何をするにしてもその認証情報を使い操作します。<br>
+                        ※認証情報は保存しないでください。認証情報はログインするごと、サーバーが再起動するごとに変化します<br>
+
+                    </p>
+                    
+                </div>
+                <div class="line"></div>-->
+                
+                <div>
+                    <h1>API</h1>
+                </div>
+                <div class="line"></div>
+                <div id="User">
+                    <h1>Userの操作</h1>
+                    <div id="createAccount">
+                        <h1>アカウントの作成</h1>
+                        <p>
+                            <h3>URL:ドメイン/api/user/create</h3>　
+                            request:POST<br>
+                            送信するjson:
+                            <pre class="brush: javascript">
+                                    {
+                                        "id":"作成するアカウントのID",
+                                        "name":"作成するアカウントの名前",
+                                        "password":"アカウントのパスワード"
+                                    }
+                            </pre>
+                            <br>
+                            返ってくるjson:<br>
+                            成功すると以下のようなjsonが返ってきます
+                            <pre class="brush: javascript">
+                                {"status":"SUCCESS","msg":"成功しました"}
+                            </pre>
+
+                            <br>
+                            失敗すると以下のようなjsonが返ってきます
+                            <pre class="brush: javascript">
+                                    {"status":"ERROR","msg":"エラー"}
+                            </pre>
+                            
+                            
+                        </p>
+                    </div>
+                    <div class="line"></div>
+                    <div id="login">
+                        <h1>ログイン・ログアウト</h1>
+                        <h2>ログイン</h2>
+                        <h3>URL:ドメイン/api/user/login</h3>
+                        <p>
+                            request:POST<br>
+                            json:
+                            <pre class="brush: javascript">
+                                {
+                                "id":"ログインするアカウントのID",
+                                "password":"ログインするアカウントのパスワード"
+                                }
+
+                            </pre>
+                        </p>
+                        <br>
+                        <P>
+                            ログインに成功すると以下のようなjsonが返ってきます。<br>
+                            このランダムな文字は（※当プロジェクトではTokenと呼ぶこととする）認証情報で<br>
+                            これを用いて今後は操作します。このTokenはログイン毎サーバーが再起動した時に強制的に変更されます<br>
+                            <pre class ="brush: javascript">
+                                    {"token":"awg8Uk5.d54TVT4PuAa9CsuGYj0xV0rX29OUCSNWK0kErXaq","status":"SUCCESS"}
+                            </pre>
+                        </P>
+                        <br>
+                        <h2>ログアウト</h2>
+                        <h3>URL: ドメイン/api/user/login</h3>
+                        request:DELETE<br>
+
+                    </div>
+                    <div class="line"></div>
+                    <div id="auth">
+                        <h1>認証情報について</h1>
+                        <p>
+                            認証情報はログイン後に発行されるランダムな文字列です。<br>
+                            APIを操作するときにはこの文字列を一緒に送信します。<br>
+                            サーバーサイドはこの文字列をもとにユーザーなどを判別します<br>
+
+                        </p>
+                        <h2>認証情報を再取得するには</h2>
+                        <p>
+                            認証情報はCookieに保存されていますがサーバにしか読み取ることができません。<br>
+                            しかしそれでは困ります。特にほかのページに遷移したときなどはJSが初期化されてしまうため認証情報を維持できません。<br>
+                            つまり例えばログインページからマイページに移動した瞬間認証情報はJSの変数から破棄されWebアプリは誰が誰なのかわから無くなってしまいます・・<br>
+                            そこでサーバにGETリクエストをすることにより、サーバがCookieを取得そしてそのCookieの認証情報をあなたに返します。
+
+                        </p>
+                        <p>
+                            <h3></h3>
+                            <b>URL:ドメイン/api/auth</b>
+                            request:GET<br>
+                            返ってくるjson
+                            <pre class ="brush: javascript">
+                                    {"token":"認証情報（Token）","status":"SUCCESS"}
+                            </pre>
+
+
+                        </p>
+                    </div>
+                    <div class="line"></div>
+                    <div id="myData">
+                        <h1>自分のデータを取得する</h1>
+                        <p>
+                            Myページを表示するときに自分のデータが必要になるときがあるでしょう。<br>
+                            <b>URL:ドメイン/api/user/i</b>
+                            <b>Request:POST</b>
+                            送信json:
+                            <pre class ="brush: javascript">
+                                    {"token":"認証情報（Token）"}
+                            </pre>
+                            <br>
+                            返ってくるjson:
+                            <pre class="brush: javascript">
+                                    {"id":"APITester","name":"APIてすと","yourGroup":[]}
+
+                                    /*
+                                    複数のグループに属している場合は"yourGroup"の後に属するグループの情報が配列として帰ってきます。
+                                    */
+                                    {
+                                        "id":"ユーザーのID",
+                                        "name":"ユーザーの名前",
+                                        "yourGroup":[
+                                            {
+                                                "groupId":"グループのID",
+                                                "groupName":"グループ名",
+                                                "yourAuthority":"ADMIN"
+                                            },
+                                            {
+                                                "groupId":"グループのID",
+                                                "groupName":"グループ名",
+                                                "yourAuthority":"LOW"
+                                            },
+                                            {
+                                                "groupId":"グループのID",
+                                                "groupName":"グループ名",
+                                                "yourAuthority":"NORMAL"
+                                            }
+                                        ]
+                                    }
+                            </pre>
+
+                        </p>
+                    </div>
+                    <div class="line"></div>
+
+                    
+                </div>
+
+                <div id="group">
+                        <h1>Group</h1>
+                        <p>
+                            QRコードによる入退出管理などは<br>
+                            基本的にGroup単位で行われます。<br>
+                            <h2>GroupとUserの関係性</h2>
+                            <ul>
+                                <li>１ユーザーが複数のグループに入れる</li>
+                                <li>グループはユーザーが1人以上いる必要がある</li>
+                                <li>一つのグループに同一のアカウントは一個</li>
+                                <li>
+                                    グループごとにユーザーのグループに対しての権限が割り当てられている
+                                    <h2>権限</h2>
+                                    <ul>
+                                        <li>ADMIN:最高権限</li>
+                                        <li>NORMAL:通常権限</li>
+                                        <li>LOW:最低権限</li>
+                                    </ul>
+                                    <p>
+                                        ADMINはグループの作成者がなります。<br>
+                                        その他権限はUserをグループに加えるときに設定することが可能です。<br>
+                                    </p>
+                                </li>
+                            </ul>
+                            
+
+                        </p>
+                        <div class="line"></div>
+                        <div id="createGroup">
+                            <h1>グループを作成する</h1>
+                            <p>
+                                グループを作成<br>
+                                <b>URL:ドメイン/api/group/create</b><br>
+                                <b>Request:POST</b><br>
+                                送信json:
+                                <pre class="brush: javascript">
+                                        {"groupId":"グループのID","groupName":"グループの名前","userToken":"ユーザーのToken"}
+                                </pre>
+                                成功するとステータスメッセージが返ってきます
+                                <pre class="brush:javascript">
+                                        {"status":"SUCCESS","msg":"成功しました"}
+                                </pre>
+                            </p>
+                        </div>
+                        <div class="line"></div>
+                        <div id="getGroupToken">
+                            <h1>グループのTokenを取得する</h1>
+                            <p>
+                                グループに対して何らかの操作をするにはグループTokenが必要です。<br>
+                                <b>URL:ドメイン/api/group/token</b><br>
+                                <b>Request:POST</b><br>
+                                送信json:
+                                <pre class="brush: javascript">
+                                    {"groupId":"グループのID","userToken":"UserのToken"}
+                                </pre>
+
+                                戻り厚切りjson
+                                <pre class="brush: javascript">
+                                    {"token":"グループのToken"}
+                                </pre>
+                            </p>
+                        </div>
+                        <div class="line"></div>
+                        <div id="addGroup">
+                            <h1>ユーザーをグループに加える</h1>
+                            <p>
+                                せっかくグループを作ってもボッチじゃ悲しいですよね？<br>
+                                そうならないためにもグループにメンバーを加えましょう！！<br>
+                                <b>ドメイン/api/group/add</b><br>
+                                <b>Request:POST</b><br>
+                                送信json:
+                                <pre class="brush: javascript">
+                                    {"groupId":"グループのID","groupToken":"グループのToken","userId":"加えるユーザーのID","authority":"加えるユーザーの権限"}
+                                </pre>
+                                どう考えてもセキュリティ的に脆弱と言えるので今後修正予定<br>
+
+                            </p>
+                        </div>
+                        
+                    </div>
+                    <div class="line"></div>
+                    <div id="entryExitCode">
+                        <h1>入退室管理コード</h1>
+                        <p>
+                            入退室管理コードとは何でしょうか？<br>
+                            入室管理コードとは入室、退出するときに認証するためのコードです。<br>
+                            これをもとにQRコードを作成します。<br>
+                            <b>入退室管理コードはADMINしか発行、再発行することができません。</b><br>
+
+                            <div class="line"></div>
+                            <div id="getCode">
+                                <h1>入退室管理コードを発行する</h1>
+                                <p>
+                                    このコードをもとに入退室のログを取ります。
+                                    <b>URL: ドメイン/api/code</b><br>
+                                    <b>Request: POST or PUT</b><br>
+                                    送信するjson:
+                                    <pre class="brush: javascript">
+                                            {
+                                                "groupId":"Group1",
+                                                "userToken":"ユーザーのToken"
+                                            }
+                                    </pre>
+
+                                    戻りjson:
+                                    <pre class="brush: javascript">
+                                        {
+                                            "groupId":"入退室管理コードを取得するGroupのID",
+                                            "entryExitCode":"入退出管理コード",
+                                            "status":"成功、失敗、などを表す"
+                                        }
+                                    </pre>
+                                    基本PUTリクエストもPOSTリクエストもほぼ同じ機能なので<br>
+                                    好みによって選択してもらえば問題ない<br>
+
+
+                                </p>
+
+
+                            </div>
+                            
+                        </p>
+                    </div>
+                    <div class="line"></div>
+                    <!--<hr>-->
+                    <div id="entryExitManagement">
+                        <h1>入退室管理</h1>
+                        <p>
+                            入退室管理コードをもとに入退室のログを取り<br>
+                            そのログを管理します。<br>
+                            <div class="line"></div>
+                            <div id="putEntryExit">
+                                <h1>入退出を記録する</h1>
+                                <p>
+                                    まず入退出を記録する先のグループの入退出管理コードを発行(取得)します。
+                                    <a href="#getCode">入退出管理コード</a><br>
+                                    <b>URL: ドメイン/access</b><br>
+                                    <b>Request GET</b><br>
+                                    ドメイン/accessの後に入退出管理コードをパラメーターとして追加します。<br>
+                                    <b>ドメイン/access/入退出管理コード</b><br>
+                                    たったこれだけです。<br>
+                                    QRコードで認証する場合はこのURLとコードをQRコードにしてください。<br>
+                                    
+                                                            
+                                </p>
+                                
+                            </div>
+                            <div class="line"></div>
+                            <div id="findLog">
+                                <h1>入退出履歴を見る</h1>
+                                <p>
+                                    <b>※アクセス権限によって見れる範囲が異なります！！！</b><br>
+                                    <ul>
+                                        <li>ADMIN:属するグループのすべてのユーザーの入退出履歴</li>
+                                        <li>NORMAL:自分の入退出履歴</li>
+                                        <li>LOW:自分の入退出履歴</li>
+                                    </ul>
+                                    <b>未実装です</b>
+                                </p>
+                            </div>
+                        </p>
+                    </div>
+            </div>
+
+
+
+            </main>
+            <!--mainここまで-->
+
+            <!--サイドバーここから-->
+            <div class="side">
+                <ul>
+                    <li><a href="#thisApp">当アプリケーションの概要</a></li>
+                    <li><a href="#whatNeed">開発に必要なもの</a></li>
+                    <li><a href="#howToUseAPI">チュートリアル</a></li>
+                    <hr>
+                    <h3>API</h3>
+                    <li>
+                        <a href="#User">Userの操作</a>
+                        <ul>
+                            <li><a href="#createAccount">アカウントの作成</a></li>
+                            <li><a href="#login">ログイン・ログアウト</a></li>
+                            <li><a href="#auth">認証情報（Token)再取得</a></li>
+                            <li><a href="#myData">自分の情報</a></li>
+                        </ul>
+                    
+                    </li>
+                    <li>
+                        <a href="#group">Groupの操作</a>
+                        
+                        <ul>
+                            <li><a href="#createGroup">グループの作成</a></li>
+                            <li><a href="#getGroupToken">グループのTokenを取得する</a></li>
+                            <li><a href="#addGroup">ユーザーをグループに加える</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#entryExitCode">入退室管理コード</a>
+                        <ul>
+                            <li><a href="#getCode">コードを発行する</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#entryExitManagement">入退室管理</a>
+                        <ul>
+                            <li><a href="#putEntryExit">入退出を記録する</a></li>
+                            <li><a href="#findLog">入退出履歴を取得する</a></li>
+                        </ul>
+                    </li>
+
+                    
+
+                </ul>
+            </div>
+            <!--サイドバーここまで-->
+        
+
+
+        </div>
+              
+            <footer class="footer">
+
+            </footer>
+        </div>
+</body>
+</html>

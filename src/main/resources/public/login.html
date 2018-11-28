@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF8">
+    <meta name="viewport" content="width=350">
+    <script src="jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="sty.css">
+</head>
+<body>
+    <div id="back">
+        <header>
+            <b>QR入退室管理</b>
+        </header>
+                
+        <main>
+            <h2>ログイン</h2>
+            <form id="form_1" method="post" accept-charset="utf-8" return false>
+                <p>ID:<input type="text" name="userid" id="userid"></p>
+                <p>パスワード:<input type="text" name="password" id="password"></p>
+            </form>
+            <button id ="ajax">ログイン</button><a href="create_account.html">アカウント作成</a>
+            <p id="ans"></p>
+        </main>
+    </div>
+    
+
+
+
+
+
+<script type="text/javascript">
+            $(function(){
+                $.ajax({
+
+                    type:'GET',
+
+                    dataType:'application/json',
+                    url:'api/auth'
+                })
+
+                .always((data) =>{
+
+                    console.log(data.responseText);
+                    var json = JSON.parse(data.responseText)
+                    if(json.token != null){
+                        token = json.token
+                        window.location.href = "/my_page"
+                        
+                    }else{
+                        console.log("ERROR")
+                    }
+
+                })
+
+                $('#ajax').on('click', function(){
+                
+                    var JSONdata = {
+
+                        "id": $('#userid').val(),
+                        "password": $('#password').val()
+
+                    }
+
+                    $.ajax({
+
+                        type:'POST',
+                        data:JSON.stringify(JSONdata),
+                        dataType:'application/json',
+                        url:'api/user/login'
+                    })
+                    
+                    .always((data) =>{
+                        $('#ans').html(data);
+                        console.log(data.responseText);
+                        var obj = JSON.parse(data.responseText)
+                        console.log(obj.msg)
+
+                        if(obj.status == "ERROR"){
+                            $('#ans').text("失敗しました入力内容をご確認の上再度送信してください")
+                        }else if(obj.token != null){
+                            window.location.href = "/my_page"
+                        }
+                    });
+                });
+            });
+        </script>
+
+</body>
+</html>
+

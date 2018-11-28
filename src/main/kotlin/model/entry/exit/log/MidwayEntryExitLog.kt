@@ -1,6 +1,7 @@
 package model.entry.exit.log
 
 import model.EntryExitLogTimeData
+import model.EntryExitLogTimeDataAndGroupId
 import model.Token
 import model.entryAndExitCode.MidwayEntryAndExitCodeController
 import model.group.AuthorityEnum
@@ -23,19 +24,34 @@ class MidwayEntryExitLog(sql2o: Sql2o){
         }
     }
 
-    fun getUserAllLog(token: Token, groupId: String):List<EntryExitLogTimeData>?{
+
+
+    //ユーザーのグループ中のすべてのログを取得する
+    fun getGroupUserLogAll(token: Token, groupId: String):List<EntryExitLogTimeData>?{
         val tokenAndId = authUser.getIdForToken(token)
         tokenAndId?: return null
-        return dbLog.getUsersAllEntryExitLog(groupId = groupId, userId = tokenAndId.id)
+        return dbLog.getUserInGroupLog(groupId = groupId, userId = tokenAndId.id)
     }
 
-    fun getGroupAllUserAllLog(token: Token, groupId: String):List<EntryExitLogTimeData>?{
+    //グループのすべてのユーザーのすべてのログを取得する
+    fun getGroupAllUsersAllOrLimitLog(token: Token, groupId: String, limit:Int = -1):List<EntryExitLogTimeData>?{
         val tokenAndId = authUser.getIdForToken(token)
         tokenAndId?: return null
         val authority = midGroup.groupGetUserAuthority(userId = tokenAndId.id, groupId = groupId)
         if(authority == AuthorityEnum.ADMIN){
-            return dbLog.getGroupAllUserAllEntryExitLog(groupId)
+            return dbLog.getAllUsersInGroupAllOrLimitLog(groupId, limit)
         }
         return null
+    }
+
+    fun getGroupAllUsersAllLog(token: Token, groupId: String):List<EntryExitLogTimeData>?{
+        return getGroupAllUsersAllOrLimitLog(token,groupId)
+    }
+
+    fun getUserAllOrLimitLog(token: Token, limit: Int = -1):List<EntryExitLogTimeDataAndGroupId>?{
+        val tokenAndId = authUser.getIdForToken(token)
+        tokenAndId?: return null
+        return dbLog.getUserAllOrLimitLog(tokenAndId.id, limit)
+
     }
 }

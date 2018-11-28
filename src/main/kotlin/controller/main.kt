@@ -58,15 +58,27 @@ fun main(args: Array<String>){
        // res.type("application/json")
     }
 
+    get("/create_account"){ _,res->
+        res.redirect("/create_account.html")
+    }
+    get("/login"){_,res->
+        res.redirect("/login.html")
+    }
+
+    get("/my_page"){_,res->
+        res.redirect("/my_page.html")
+    }
+
 
     //入退室のログを取る
     path("/access"){
         get("/:access"){ req, res ->
             val token = req.session().attribute<String>("token")
             if(token == null){
-                return@get "ログインしてください"
+                res.redirect("/login")
             }else{
                 surfaceLog.addLog(req.params(":access"),Token(token))
+                res.redirect("/my_page.html")
             }
 
         }
@@ -85,7 +97,10 @@ fun main(args: Array<String>){
                 }
 
                 post(""){req, _ ->
-                    surfaceUserController.createAccount(req.body())
+                    println("${req.body()} なんでおかしいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい")
+                    val re =surfaceUserController.createAccount(req.body())
+                    println("戻り値いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい$re")
+                    re
                 }
             }
 
@@ -193,14 +208,46 @@ fun main(args: Array<String>){
         }
 
         path("/log"){
-            //入退出ログの操作機能をここに実装する
-            post("/all"){ req, _->
+            //入退出ログの取得操作機能をここに実装する
 
+            //グループのすべてのユーザーのすべてのログを取得
+            post("/group-all"){ req, _->
+                surfaceLog.getGroupAllUserAllLog(req.body())
             }
 
-            post("/mine"){req,_->
+            //グループのすべてのユーザーを直近の指定回数分だけ取得する
+            /*post("/group-count"){req,_res->
 
+            }*/
+
+            //グループの自分のすべてのログを取得する
+            post("/mine-group-all"){req,_->
+                surfaceLog.getGroupUserAllLog(req.body())
             }
+
+            /*post("/mine-group-count"){req,_->
+
+            }*/
+
+            //グループを問わず
+            post("/mine-all"){req,_->
+                surfaceLog.getUserAllLog(req.body())
+            }
+
+            post("/mine-group-count"){req,_->
+                surfaceLog.getUserLimitLog(req.body())
+            }
+
+            //グループを問わず自分のログをすべて取得する
+
+
+
+
+            /*post("/"){req,_->
+
+            }*/
+
+
 
         }
 

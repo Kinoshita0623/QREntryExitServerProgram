@@ -1,0 +1,37 @@
+
+body{
+    /*background-color:rgb(245, 245, 245)*/
+   
+}
+header{
+    /*width:1000px;*/
+    font-size:30px;
+    
+    
+    margin-bottom:-10px;
+    background-color:rgb(253, 253, 255);
+    padding-left:30px;
+    padding-right:30px;
+    padding-top:10px;
+    padding-bottom:10px;
+}
+main{
+    
+    margin-top:20px;
+    padding-top:1px;
+    padding-left:30px;
+    padding-right:30px;
+    padding-bottom:20px;
+    background-color:rgb(255, 255, 255);
+    /*font-size:130%;*/
+    
+}
+
+#back{
+    width:350px;
+    margin:0 auto;
+}
+
+p{
+    font-size:90%;
+}
