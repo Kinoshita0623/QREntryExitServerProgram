@@ -111,7 +111,7 @@ class DBEntryExitLog(private val sql2o: Sql2o): DBGroupController(sql2o){
         val whereQuery = "WHERE user_id = :userId AND group_id = $searchGroupPrimaryKey"
         //val logQuery = "SELECT year, month, day, hour, minute, flag FROM ENTRY_EXIT_LOG $whereQuery"
         val join = "FROM ENTRY_EXIT_LOG LOG INNER JOIN USER_TABLE UT ON LOG.USER_ID = UT.PRIMARY_ID"
-        val logQuery = "SELECT id as USERID, year, month, day, hour, minute, flag $join $whereQuery"
+        val logQuery = "SELECT UT.id as userId, year, month, day, hour, minute, flag $join $whereQuery"
         sql2o.open().use{
             val query = it.createQuery(logQuery).apply{
                 addParameter("userId",userId)
@@ -147,7 +147,7 @@ class DBEntryExitLog(private val sql2o: Sql2o): DBGroupController(sql2o){
         val whereQuery ="WHERE GT.ID = :groupId"
         val join1 = "INNER JOIN USER_TABLE UT ON UT.PRIMARY_ID = LOG.USER_ID"
         val join0 = "FROM (ENTRY_EXIT_LOG LOG INNER JOIN GROUP_TABLE GT ON LOG.GROUP_ID = GT.PRIMARY_ID)"
-        val select = "SELECT id as userId, year, month, day, hour, minute, flag"
+        val select = "SELECT UT.id as userId, year, month, day, hour, minute, flag"
         val basicQueryText = "$select $join0 $join1 $whereQuery"
         val queryText = if(limit >= limitCondition) "$basicQueryText $limitText" else basicQueryText
         sql2o.open().use{
@@ -171,7 +171,7 @@ class DBEntryExitLog(private val sql2o: Sql2o): DBGroupController(sql2o){
         val join1 = "INNER JOIN USER_TABLE UT ON UT.PRIMARY_ID = LOG.USER_ID "
         val join0 = "FROM (ENTRY_EXIT_LOG LOG INNER JOIN GROUP_TABLE GT ON LOG.GROUP_ID =GT.PRIMARY_ID) "
         //GroupTableのグループIDの列名はidでややこしいのでgroupIdに変換している
-        val select = "SELECT id as groupId, year, month ,day ,hour, minute, flag"
+        val select = "SELECT GT.id as groupId, year, month ,day ,hour, minute, flag"
         val queryText =
                 if(limit >= limitCondition){
             "$select $join0 $join1 $whereQuery $order $limitText"
@@ -182,7 +182,7 @@ class DBEntryExitLog(private val sql2o: Sql2o): DBGroupController(sql2o){
         sql2o.open().use{
             val query = it.createQuery(queryText).apply{
                 addParameter("userId",userId)
-                if(limit >= limitCondition){ addParameter("limit",limitText) }
+                if(limit >= limitCondition){ addParameter("limit",limit) }
             }
             return query.executeAndFetch(EntryExitLogTimeDataAndGroupId::class.java)
         }

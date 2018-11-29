@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF8">
+        <meta name="viewport" content="width=350">
+        <script src="jquery-3.3.1.min.js"></script>
+        <link rel="stylesheet" href="sty.css">
+
+        <script type ="text/javascript" src="jquery.qrcode.js"></script>
+        <script type="text/javascript" src="qrcode.js"></script>
+    </head>
+    <body>
+        <div id="back">
+            <header>
+                <b>QR入退室管理</b>
+            </header>
+                    
+            <main>
+                <h2>QRコード取得</h2>
+                <form id="form_1" method="post" accept-charset="utf-8" return false>
+                    <p>取得するグループID<input type="text" name="groupId" id="groupId"></p>
+                                            
+                    </form>
+                    <button id ="getGroupId">QRコードを取得する</button>
+                    <p id="result"></p>
+                    <div id ="qrcodeTable"></div>
+                
+                </main>
+        </div>
+        <script type="text/javascript">
+            var token = ""
+            var code = ""
+
+            $(function(){
+                $.ajax({
+                    type:'GET',
+                    dataType: 'application/json',
+                    url:'api/auth'
+                }).always((data)=>{
+                    var obj = JSON.parse(data.responseText);
+                    if(obj.token != null){
+                        token = obj.token
+                    }else{
+                        window.location.href = "/login"
+                    }
+                })
+            });
+            $(function(){
+                $('#getGroupId').on('click',function(){
+                    var JSONdata = {
+                        "groupId":$('#groupId').val(),
+                        "userToken":token
+                    }
+                    $.ajax({
+                        type:'PUT',
+                        dataType:'application/json',
+                        data:JSON.stringify(JSONdata),
+                        url:'api/code'                        
+                    }).always((data)=>{
+                        console.log(JSONdata)
+                        var obj = JSON.parse(data.responseText)
+                        console.log(obj)
+                        if(obj.entryExitCode != null){
+                            code = obj.entryExitCode
+                            console.log(code)
+                            $('#qrcodeTable').qrcode({
+                                render : "table",
+                                text : location.host + "/access/" + code
+                            });
+                        }else{
+                            $('#result').text(obj.status)
+                        }
+                    })
+                })
+            })
+        </script>
+        
+    </body>
+</html>

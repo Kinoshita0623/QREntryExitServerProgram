@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        
+        <meta charset="UTF8">
+         <meta name="viewport" content="width=350">
+        <script src="jquery-3.3.1.min.js"></script>
+        <link rel="stylesheet" href="sty.css">
+        <title>グループ作成</title>
+    </head>
+    <body>
+            <div id="back">
+                <header>
+                    <b>QR入退室管理</b>
+                </header>
+                        
+                <main>
+                    <h2>グループの作成</h2>
+                    <form id="form_1" method="post" accept-charset="utf-8" return false>
+                        <p>GroupID:<input type="text" name="userId" id="groupId"></p>
+                        <p>GroupName:<input type="text" name="groupName" id="groupName"></p>
+                                
+                    </form>
+                            <button id ="createGroup">ajax</button>
+                            <p id="errStatus"></p>
+                </main>
+            </div>
+
+            <script type="text/javascript">
+                var token = ""
+                $(function(){
+                    $.ajax({
+                        type:'GET',
+                        dataType:'application/json',
+                        url:'api/auth'
+                    }).always((data)=>{
+                        var obj = JSON.parse(data.responseText);
+                        if(obj.token != null){
+                            token = obj.token
+                        }else{
+                            window.location.href="/login"
+                        }
+                    })
+                });
+
+                $(function(){
+                    $('#createGroup').on('click',function(){
+                        var JSONdata = {
+                            "groupId": $('#groupId').val(),
+                            "groupName":$('#groupName').val(),
+                            "userToken":token
+                        }
+                        $.ajax({
+                            type:'POST',
+                            data:JSON.stringify(JSONdata),
+                            dataType:'application/json',
+                            url:'api/group/create'
+                        }).always((data)=>{
+                            var obj = JSON.parse(data.responseText);
+                            if(obj.status == "SUCCESS"){
+                                window.location.href= "/my_page"
+                            }else{
+                                $('errStatus').text("失敗しました");
+                            }
+                        });
+                    });
+                });
+                
+            </script>
+    </body>
+</html>

@@ -32,7 +32,7 @@ fun main(args: Array<String>){
     val surfaceCode = SurfaceEntryAndExitCodeController(sql2o)
 
     port(Integer.parseInt(Optional.ofNullable(System.getenv("PORT")).orElse("5353")))
-    staticFileLocation("/public")
+    staticFileLocation("/public/example")
 
 
 
@@ -50,13 +50,14 @@ fun main(args: Array<String>){
         return@options "OK"
     }
 
-    before("/*"){ req ,res ->
+    before("/*"){ _ ,res ->
         res.header("Access-Control-Allow-Origin","*")
         res.header("Access-Control-Request-Method","POST,GET,OPTIONS,DELETE,PUT")
         //res.header("Access-Control-Allow-Headers",)
 
        // res.type("application/json")
     }
+
 
     get("/create_account"){ _,res->
         res.redirect("/create_account.html")
@@ -67,6 +68,14 @@ fun main(args: Array<String>){
 
     get("/my_page"){_,res->
         res.redirect("/my_page.html")
+    }
+    get("/create_group"){_,res->
+        res.redirect("/create_group.html")
+
+    }
+
+    get("/get_qr"){_,res->
+        res.redirect("/get_qr.html")
     }
 
 
@@ -210,7 +219,7 @@ fun main(args: Array<String>){
         path("/log"){
             //入退出ログの取得操作機能をここに実装する
 
-            //グループのすべてのユーザーのすべてのログを取得
+            //グループのすべてのユーザーのすべてのログを取得 要管理者
             post("/group-all"){ req, _->
                 surfaceLog.getGroupAllUserAllLog(req.body())
             }
@@ -234,11 +243,11 @@ fun main(args: Array<String>){
                 surfaceLog.getUserAllLog(req.body())
             }
 
-            post("/mine-group-count"){req,_->
+            post("/mine-limit"){req,_->
                 surfaceLog.getUserLimitLog(req.body())
             }
 
-            //グループを問わず自分のログをすべて取得する
+
 
 
 

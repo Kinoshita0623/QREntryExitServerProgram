@@ -77,6 +77,7 @@
                         $('#userName').text(obj.name + "さんようこそ")
                         array = obj.yourGroup
                         //displayGroups()
+                        displayLog();
                         
                     }else{
                         window.location.href = "/login"
@@ -107,6 +108,31 @@
                 }
                 
                 
+            }
+
+            function displayLog(){
+
+                var jsonData = {
+                    "token":token,
+                    "limit":4
+                }
+                $.ajax({
+                    type:'POST',
+                    dataType:'application/javascript',
+                    data:JSON.stringify(jsonData),
+                    url:'api/log/mine-limit'
+
+                }).always((data)=>{
+                    var obj = JSON.parse(data.responseText);
+                    if(obj.status != "ERROR"){
+                        for(let v of obj){
+                            $('#near_log').after("<p class=\"logList\">" + v.groupId 
+                            + ":" + v.year + "/" + v.month + "/" + v.day + "/" + v.hour + "/" + v.minute + ":" + v.flag + "</p>"); 
+                            //console.log(obj);
+                        }
+                    }
+                    console.log(obj);
+                });
             }
         </script>
 
