@@ -78,6 +78,11 @@ fun main(args: Array<String>){
         res.redirect("/get_qr.html")
     }
 
+    get("/add_member"){_,res->
+        res.redirect("/add_member.html")
+
+    }
+
 
     //入退室のログを取る
     path("/access"){

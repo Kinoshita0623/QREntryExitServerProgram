@@ -130,11 +130,17 @@ abstract class DBGroupController(private val sql2o: Sql2o){
     protected fun addMember(groupId: String, userId:String,authority: AuthorityEnum):Boolean{
         val groupList = searchGroupAndUser(groupId = groupId, userId = userId)
         return when{
-
+            userId.isBlank() || groupId.isBlank()  ->{
+                false
+            }
+            !userDBController.searchUser(userId) ->{
+                false
+            }
             groupList?.firstOrNull() != null ->{
                 println("追加済みのため対象のユーザーをグループに追加することはできませんでした。")
                 false
             }
+
             else ->{
                 val searchUserPrimaryId = "SELECT primary_id FROM USER_TABLE WHERE id = :user_id"
                 val searchGroupPrimaryId = "SELECT primary_id FROM GROUP_TABLE WHERE id = :group_id"

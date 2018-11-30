@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF8">
+        <meta name="viewport" content="width=350">
+        <script src="jquery-3.3.1.min.js"></script>
+        <link rel="stylesheet" href="sty.css">
+    </head>
+    <body>
+        <div id="back">
+            <header>
+                <b>QR入退室管理</b>
+            </header>
+                            
+            <main>
+                <h2>メンバーを加える</h2>
+                <p>
+                    ※グループの作成者又は権限がADMINのメンバー以外
+                    グループにユーザーを加えることはできません！！
+                </p>
+                <form id="form_1" method="post" accept-charset="utf-8" return false>
+                    <p>加える先のGroupId:<input type="text" id="groupId" name ="groupId"></p>
+                    <p>加えるUserの権限<br>
+                        <select id="selectAuthority">
+                            <option value="0">管理者</option>
+                            <option value="1">通常ユーザー</option>
+                            <option value="2">ゲストユーザー</option>
+                        </select>
+                    </p>
+                    <p>加えるUserのID:<input type="text" id="userId" name="userId"></p>
+                </form>
+                <button id="addMember">加える</button>
+                <p id="result"></p>
+                        
+            </main>
+        </div>
+    </body>
+</html>
+
+<script type="text/javascript">
+    var token = ""
+    $(function(){
+        $.ajax({
+
+            type:'GET',
+                
+            dataType:'application/json',
+            url:'api/auth'
+        })
+
+        .always((data) =>{
+                
+            console.log(data.responseText);
+            var json = JSON.parse(data.responseText)
+            if(json.token != null){
+                token = json.token
+                        //console.log(token)
+                
+            }else{
+                window.location.href="/login"
+            }
+                    
+        })
+                
+        console.log(token)
+    });
+    $('#addMember').on('click', function(){
+        var authority = ""
+        var selected = $('#selectAuthority').val()
+        if(selected == 0){
+            authority = "ADMIN"
+        }else if(selected == 1){
+            authority = "NORMAL"
+        }else if(selected == 2){
+            authority = "LOW"
+        }
+
+        var jsonData={
+            "groupId":$('#groupId').val(),
+            "addUserId":$('#userId').val(),
+            "authority":authority,
+            "userToken":token
+        }
+
+        $.ajax({
+            type:'POST',
+            dataType:'application/json',
+            data:JSON.stringify(jsonData),
+            url:'api/group/add'
+        }).done((data)=>{
+            /*var obj = JSON.parse(data.responseText)
+            if(obj.status == "SUCCESS"){
+                $('#result').text("成功しました")
+            }else{
+                $('#result').text("失敗しました")
+            }*/
+        }).always((data)=>{
+            var obj = JSON.parse(data.responseText)
+            console.log(obj)
+            if(obj.status == "SUCCESS"){
+                $('#result').text(obj.msg)
+            }else{
+                $('#result').text(obj.msg)
+            }
+        });
+    });
+</script>
