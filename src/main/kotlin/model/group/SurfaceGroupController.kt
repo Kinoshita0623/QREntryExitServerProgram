@@ -30,7 +30,7 @@ class SurfaceGroupController(sql2o: Sql2o){
 
     }
 
-    fun addMember(json: String): String{
+    /*fun addMember(json: String): String{
 
         return try{
             val addInfo = g.fromJson(json, AddGroupInfo::class.java)
@@ -46,9 +46,22 @@ class SurfaceGroupController(sql2o: Sql2o){
         }catch(e: JsonSyntaxException){
             g.toJson(APIStatus(StatusEnumObj.JSON_ERROR, msg = "送信したjsonを確認してください"))
         }
+    }*/
+    fun addMember(json: String): String{
+        return try{
+            val addInfo = g.fromJson(json,AddUserInfo::class.java)
+            val authority = AutoAuthorityEnum().getAuthority(addInfo.authority)
+            if(midwayGroup.addMember(groupId = addInfo.groupId, addUserId = addInfo.addUserId, token = Token(token = addInfo.userToken), authority = authority)){
+                g.toJson(APIStatus(StatusEnumObj.SUCCESS, msg = "ユーザーはグループに加えられました"))
+            }else{
+                g.toJson(APIStatus(StatusEnumObj.ERROR, msg = "ユーザーをグループに追加することができませんでした"))
+            }
+        }catch(e: JsonSyntaxException){
+            g.toJson(APIStatus(StatusEnumObj.JSON_ERROR, msg = "JSONに問題があります"))
+        }
     }
 
-    fun getGroupToken(json: String):String{
+    /*fun getGroupToken(json: String):String{
         //JsonSyntaxException
         try{
             val obj = g.fromJson(json, GetGroupToken::class.java)
@@ -61,6 +74,6 @@ class SurfaceGroupController(sql2o: Sql2o){
         }
 
 
-    }
+    }*/
 
 }

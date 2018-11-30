@@ -18,7 +18,7 @@ class MidwayEntryAndExitCodeController(sql2o: Sql2o){
     private val group = MidwayGroupController(sql2o)
 
     private data class GroupIdAndCode(val groupId: String, val code:String)
-    private data class GroupAndUserAndAuthority(val groupName: String, val userId: String, val authority: String)
+    //private data class GroupAndUserAndAuthority(val groupName: String, val userId: String, val authority: String)
 
     companion object{
         private val codeList = Collections.synchronizedList(ArrayList<GroupIdAndCode>())

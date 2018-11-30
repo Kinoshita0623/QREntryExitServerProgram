@@ -17,8 +17,26 @@ class MidwayGroupController(sql2o: Sql2o): DBGroupController(sql2o){
         }
     }
 
-    fun addMember(groupId: String, groupToken: String, userId: String, authority: AuthorityEnum): Boolean{
+    /*fun addMember(groupId: String, groupToken: String, userId: String, authority: AuthorityEnum): Boolean{
         return super.addMember(groupId = groupId, groupToken = groupToken, userId = userId, authority = authority, needCheck = true)
+    }*/
+    fun addMember(groupId: String, addUserId: String, authority: AuthorityEnum, token: Token):Boolean{
+        val tokenAndId = account.getIdForToken(token)
+        val id = tokenAndId?.id
+        if(id == null){
+            return false
+        }else{
+            val groupList =super.searchGroupAndUser(groupId = groupId, userId = id)
+            groupList?: return false
+            val userGroupData = groupList.firstOrNull{it -> it.groupId == groupId }
+            userGroupData?: return false
+
+            return if(AutoAuthorityEnum().getAuthority(userGroupData.authority) == AuthorityEnum.ADMIN){
+                super.addMember(groupId = groupId ,userId = addUserId, authority = authority)
+            }else{
+                false
+            }
+        }
     }
 
     fun getYourGroups(token: Token):ArrayList<GroupAndYourStatus>?{
@@ -35,7 +53,7 @@ class MidwayGroupController(sql2o: Sql2o): DBGroupController(sql2o){
         }
     }
 
-    fun getGroupToken(token: Token, groupId: String):String?{
+    /*fun getGroupToken(token: Token, groupId: String):String?{
         val tokenAndId = account.getIdForToken(token)
         val id = tokenAndId?.id?: return null
         val dataList = super.searchGroupAndUser(groupId = groupId, userId = id)?: return null
@@ -45,7 +63,7 @@ class MidwayGroupController(sql2o: Sql2o): DBGroupController(sql2o){
         }
         return null
 
-    }
+    }*/
 
     fun groupGetUserAuthority(userId: String, groupId: String):AuthorityEnum?{
         val userData = super.searchGroupAndUser(groupId = groupId, userId = userId)?.firstOrNull()

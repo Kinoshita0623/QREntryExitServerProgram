@@ -420,7 +420,7 @@
                             </p>
                         </div>
                         <div class="line"></div>
-                        <div id="getGroupToken">
+                        <!--<div id="getGroupToken">
                             <h1>グループのTokenを取得する</h1>
                             <p>
                                 グループに対して何らかの操作をするにはグループTokenが必要です。<br>
@@ -437,7 +437,7 @@
                                 </pre>
                             </p>
                         </div>
-                        <div class="line"></div>
+                        <div class="line"></div>-->
                         <div id="addGroup">
                             <h1>ユーザーをグループに加える</h1>
                             <p>
@@ -446,10 +446,13 @@
                                 <b>ドメイン/api/group/add</b><br>
                                 <b>Request:POST</b><br>
                                 送信json:
+                                <!--{"groupId":"グループのID","groupToken":"グループのToken","userId":"加えるユーザーのID","authority":"加えるユーザーの権限"}-->
                                 <pre class="brush: javascript">
-                                    {"groupId":"グループのID","groupToken":"グループのToken","userId":"加えるユーザーのID","authority":"加えるユーザーの権限"}
+                                    
+                                    {"groupId":"グループのID","addUserId":"加えるユーザーのID","authority":"加えるユーザーの権限","userToken":"グループの管理者のToken"}
                                 </pre>
                                 どう考えてもセキュリティ的に脆弱と言えるので今後修正予定<br>
+                                修正済み！！<br>
 
                             </p>
                         </div>
@@ -567,7 +570,7 @@
                         
                         <ul>
                             <li><a href="#createGroup">グループの作成</a></li>
-                            <li><a href="#getGroupToken">グループのTokenを取得する</a></li>
+                            <!--<li><a href="#getGroupToken">グループのTokenを取得する</a></li>-->
                             <li><a href="#addGroup">ユーザーをグループに加える</a></li>
                         </ul>
                     </li>

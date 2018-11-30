@@ -29,7 +29,8 @@ enum class StatusEnumObj(status: String){
 
 //Group関連
 data class CreateGroupInfo(val groupId: String, val groupName: String,  val userToken :String)
-data class AddGroupInfo(val groupId:String ,val groupToken:String, val userId:String, val authority:String)
+//data class AddGroupInfo(val groupId:String ,val groupToken:String, val userId:String, val authority:String)
+data class AddUserInfo(val groupId: String, val addUserId: String, val authority: String, val userToken: String)
 data class GetGroupToken(val groupId:String, val userToken: String)
 
 //入退室管理コード関連

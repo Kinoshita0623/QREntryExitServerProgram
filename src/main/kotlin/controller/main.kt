@@ -195,11 +195,11 @@ fun main(args: Array<String>){
                     return@post surfaceGroupController.addMember(req.body())
                 }
             }
-            post("/token"){req,_->
+            /*post("/token"){req,_->
                 return@post surfaceGroupController.getGroupToken(req.body())
 
 
-            }
+            }*/
 
         }
 
@@ -209,7 +209,8 @@ fun main(args: Array<String>){
                return@get surfaceCode.getCodeGetType(req.params(":groupId"),Token(req.session().attribute("token")))
             }
             post(""){req,_->
-                return@post surfaceCode.getCodePostType(req.body())
+                //return@post surfaceCode.getCodePostType(req.body())
+                return@post surfaceCode.changeOrCreateCode(req.body())
             }
             put(""){req,_->
                 return@put surfaceCode.changeOrCreateCode(req.body())
@@ -234,7 +235,7 @@ fun main(args: Array<String>){
                 surfaceLog.getGroupUserAllLog(req.body())
             }
 
-            /*post("/mine-group-count"){req,_->
+            /*post("/mine-group-limit"){req,_->
 
             }*/
 
@@ -246,16 +247,6 @@ fun main(args: Array<String>){
             post("/mine-limit"){req,_->
                 surfaceLog.getUserLimitLog(req.body())
             }
-
-
-
-
-
-
-            /*post("/"){req,_->
-
-            }*/
-
 
 
         }

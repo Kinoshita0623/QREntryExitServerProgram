@@ -54,7 +54,7 @@ abstract class DBGroupController(private val sql2o: Sql2o){
                  query.executeUpdate().result
 
                 it.commit()
-                return if(addMember(groupId = groupId, groupToken = token ,userId = userId, authority = AuthorityEnum.ADMIN, needCheck = false)){
+                return if(addMember(groupId = groupId, userId = userId, authority = AuthorityEnum.ADMIN)){
                     //it.commit()
                     true
                 }else{
@@ -72,7 +72,7 @@ abstract class DBGroupController(private val sql2o: Sql2o){
 
 
 
-    protected fun addMember(groupId:String, groupToken:String, userId: String, authority: AuthorityEnum, needCheck:Boolean = true):Boolean{
+    /*protected fun addMember(groupId:String, groupToken:String, userId: String, authority: AuthorityEnum, needCheck:Boolean = true):Boolean{
 
         val doHaveMember = searchGroupAndUser(groupId = groupId, userId = userId)
         val doHaveUser = userDBController.searchUser(userId)
@@ -125,6 +125,48 @@ abstract class DBGroupController(private val sql2o: Sql2o){
 
 
         return false
+    }*/
+
+    protected fun addMember(groupId: String, userId:String,authority: AuthorityEnum):Boolean{
+        val groupList = searchGroupAndUser(groupId = groupId, userId = userId)
+        return when{
+
+            groupList?.firstOrNull() != null ->{
+                println("追加済みのため対象のユーザーをグループに追加することはできませんでした。")
+                false
+            }
+            else ->{
+                val searchUserPrimaryId = "SELECT primary_id FROM USER_TABLE WHERE id = :user_id"
+                val searchGroupPrimaryId = "SELECT primary_id FROM GROUP_TABLE WHERE id = :group_id"
+                val memberQueryText = "INSERT INTO MEMBER_TABLE(user_id,group_id,authority) VALUES($searchUserPrimaryId, $searchGroupPrimaryId, :authority )"
+                try{
+                    sql2o.beginTransaction().use{
+                        val query = it.createQuery(memberQueryText).apply{
+                            addParameter("user_id",userId)
+                            addParameter("group_id",groupId)
+                            addParameter("authority", authority.toString())
+                        }
+                        val i = query.executeUpdate().result
+                        return if(i < 1){
+                            it.rollback()
+                            println("失敗したああああああああああああああああああああああああああああああああああああああああああああああああああああああああ")
+                            false
+                        }else{
+                            it.commit()
+                            println("成功したああああああああああああああああああああああああああああああああああああああああああああああああああああ")
+                            true
+                        }
+                    }
+                }catch(e: Exception){
+                    e.printStackTrace()
+                    println("Exception投げやがったあああああああああああああああああああああああああああああああああああああああああああああああああ")
+                    false
+                }
+            }
+
+
+        }
+
     }
 
 
