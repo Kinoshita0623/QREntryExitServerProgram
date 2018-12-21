@@ -63,10 +63,14 @@
                         if(obj.entryExitCode != null){
                             code = obj.entryExitCode
                             console.log(code)
-                            $('#qrcodeTable').qrcode({
+                            var url = "http://" + location.host + "/access/" + code
+                            console.log(url)
+                            /*$('#qrcodeTable').qrcode({
                                 render : "table",
                                 text : location.host + "/access/" + code
-                            });
+
+                            });*/
+                            $('#qrcodeTable').qrcode(url)
                         }else{
                             $('#result').text(obj.status)
                         }
