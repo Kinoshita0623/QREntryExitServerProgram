@@ -155,17 +155,14 @@ abstract class DBGroupController(private val sql2o: Sql2o){
                         val i = query.executeUpdate().result
                         return if(i < 1){
                             it.rollback()
-                            println("失敗したああああああああああああああああああああああああああああああああああああああああああああああああああああああああ")
                             false
                         }else{
                             it.commit()
-                            println("成功したああああああああああああああああああああああああああああああああああああああああああああああああああああ")
                             true
                         }
                     }
                 }catch(e: Exception){
                     e.printStackTrace()
-                    println("Exception投げやがったあああああああああああああああああああああああああああああああああああああああああああああああああ")
                     false
                 }
             }

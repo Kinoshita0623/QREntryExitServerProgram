@@ -13,7 +13,8 @@ class MidwayGroupController(sql2o: Sql2o): DBGroupController(sql2o){
         return if(id == null){    //Tokenが存在しない（ログインしていない,Tokenの値が不正である）
             false
         }else{
-            super.createGroup(groupId = groupId, groupName = groupName, userId = id)
+            val trimGroupId = groupId.trim()
+            super.createGroup(groupId = trimGroupId, groupName = groupName, userId = id)
         }
     }
 
