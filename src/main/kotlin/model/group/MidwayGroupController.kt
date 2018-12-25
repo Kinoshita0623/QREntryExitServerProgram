@@ -28,6 +28,7 @@ class MidwayGroupController(sql2o: Sql2o): DBGroupController(sql2o){
             return false
         }else{
             val groupList =super.searchGroupAndUser(groupId = groupId, userId = id)
+
             groupList?: return false
             val userGroupData = groupList.firstOrNull{it -> it.groupId == groupId }
             userGroupData?: return false
